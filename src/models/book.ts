@@ -1,0 +1,60 @@
+import client from "../database";
+
+export type Book = {
+    id: Number;
+    title: string;
+    author: string;
+    total_pages: number;
+    type: string;
+    summary: string
+}
+
+export class BookStore {
+    async index(): Promise<Book[]> {
+        try {
+            const connection = await client.connect()
+            const sql = 'SELECT * FROM books';
+            const result = await connection.query(sql)
+            connection.release()
+            return result.rows;
+        } catch (err) {
+            throw new Error(`No result found ${err}`);
+        }
+    }
+    async show(id: string): Promise<Book> {
+        try {
+            const connection = await client.connect()
+            const sql = 'SELECT FROM books WHERE id = ($1)';
+            const result = await connection.query(sql, [id]);
+            connection.release();
+            return result.rows[0]
+        }
+        catch (err:any) {
+            throw new Error(err)
+        }
+    }
+    async create(b: Book): Promise<Book> {
+        try {
+            const connection = await client.connect();
+            const sql = 'INSET INTO books(title, author, total_pages, type, summary) VALUES ("Intro to C", "Bob", 500, "Computer Science", "Learn Programming")';
+            const result = await connection.query(sql, [b.title, b.author, b.total_pages, b.summary]);
+            connection.release();
+            return result.rows[0]
+        } catch(err) {
+            throw new Error(`Error happend in insertion ${err}`);
+        }
+      
+    }
+    async delete(id: string): Promise<Book> {
+        try {
+            const connection = await client.connect();
+            const sql = 'DELETE FROM books WHERE id = ($1)';
+            const result = await connection.query(sql, [id]);
+            connection.release();
+            return result.rows[0]
+        } catch(err) {
+            throw new Error(`Error, can not delete ${err}`);
+        }
+      
+    }
+}

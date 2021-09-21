@@ -1,5 +1,5 @@
-import Client from '../database';
 import app from '../server';
+import client from '../database';
 
 export type Wolrd = {
     id: Number;
@@ -10,7 +10,7 @@ export type Wolrd = {
 export class MythicalWorldStore {
     async index(): Promise<Wolrd[]> {
         try {
-            const conn = await Client.connect()
+            const conn = await client.connect()
             const sql = 'SELECT * FROM mythical_worlds'
             const result = await conn.query(sql)
             conn.release()

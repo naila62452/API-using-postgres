@@ -1,7 +1,7 @@
 import client from "../database";
 
 export type Book = {
-    id: Number;
+    id?: string;
     title: string;
     author: string;
     total_pages: number;
@@ -23,11 +23,14 @@ export class BookStore {
     }
     async show(id: string): Promise<Book> {
         try {
+            console.log(id)
             const connection = await client.connect()
-            const sql = 'SELECT FROM books WHERE id = ($1)';
+            const sql = 'SELECT * FROM books WHERE id = ($1)';
             const result = await connection.query(sql, [id]);
+            console.log(result);
             connection.release();
             return result.rows[0]
+
         }
         catch (err:any) {
             throw new Error(err)
@@ -36,8 +39,9 @@ export class BookStore {
     async create(b: Book): Promise<Book> {
         try {
             const connection = await client.connect();
-            const sql = 'INSET INTO books(title, author, total_pages, type, summary) VALUES ("Intro to C", "Bob", 500, "Computer Science", "Learn Programming")';
-            const result = await connection.query(sql, [b.title, b.author, b.total_pages, b.summary]);
+            const sql = 'INSERT INTO books(title, author, total_pages, type, summary) VALUES \
+            (($1), ($2), ($3), ($4), ($5))';
+            const result = await connection.query(sql, [b.title, b.author, b.total_pages, b.type, b.summary]);
             connection.release();
             return result.rows[0]
         } catch(err) {
@@ -49,7 +53,7 @@ export class BookStore {
         try {
             const connection = await client.connect();
             const sql = 'DELETE FROM books WHERE id = ($1)';
-            const result = await connection.query(sql, [id]);
+            const result = await connection.query(sql , [id]);
             connection.release();
             return result.rows[0]
         } catch(err) {
@@ -57,4 +61,4 @@ export class BookStore {
         }
       
     }
-}
+} 
